@@ -1,0 +1,2 @@
+defmodule Musikki do
+end
