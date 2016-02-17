@@ -51,27 +51,14 @@ defmodule Musikki.Artists do
 	end
 
 	def collaborations(mkid, filters) do 
-		collabs mkid, filters, ""
-	end
-
-	defp collabs(mkid, [], args_list) do 
 		HTTPoison.request(
 			:get, 
-			@host <> @endpoint <> "/#{mkid}" <> "/collaborations" 
-						<> "?q=" <> args_list, 
+			@host <> @endpoint <> "/#{mkid}" <> "/collaborations" <> build_query_params(filters, ""), 
 			"", 
 			[
 				@appID, 
 				@appKey
-			])				
-	end
-
-	defp collabs(mkid, [{param, value} | tail], args_list) do 
-		case tail do 
-			[] -> collabs mkid, tail, args_list <> "[#{param}:#{value}]"
-
-			_  -> collabs mkid, tail, args_list <> "[#{param}:#{value}],"
-		end
+			])
 	end
 
 	def labels(mkid) do 
@@ -118,5 +105,101 @@ defmodule Musikki.Artists do
 			])			
 	end
 
+	def releases(mkid) do
+		HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/releases", 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])
+	end	
+
+	def releases(mkid, filters) do 
+		HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/releases" <> build_query_params(filters, ""), 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])
+	end
+
+	def release_summary(mkid) do
+	 	HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/releases/summary", 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])
+	end
+
+	def social(mkid, service) do 
+		HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/social?q=[service-name:#{service}]", 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])			
+	end	
+
+def songs(mkid) do
+		HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/songs", 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])
+	end	
+
+	def songs(mkid, filters) do 
+		HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/songs" <> build_query_params(filters, ""), 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])
+	end
+
+	def videos(mkid) do 
+		HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/videos", 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])		
+	end
+
+	def videos(mkid, filters) do 
+		HTTPoison.request(
+			:get, 
+			@host <> @endpoint <> "/#{mkid}" <> "/videos" <> build_query_params(filters, ""), 
+			"", 
+			[
+				@appID, 
+				@appKey
+			])		
+	end	
+
+	defp build_query_params([], param_list), do: "?q=" <> param_list
+	defp build_query_params([{param, value} | tail], param_list) do 
+		case tail do 
+			[] -> build_query_params tail, param_list <> "[#{param}:#{value}]"
+
+			_  -> build_query_params tail, param_list <> "[#{param}:#{value}],"
+		end		
+	end
  	
  end
