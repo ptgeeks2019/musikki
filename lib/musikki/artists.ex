@@ -1,14 +1,24 @@
 defmodule Musikki.Artists do
+	import Musikki.Helper, only: [build_query_params: 2]
 
 	@endpoint ~s(/artists)
-	@host 		~s(https://music-api.musikki.com/v1)
+	@host 							 Application.get_env(:musikki, :host)
 	@appID 		{"AppID",  Application.get_env(:musikki, :appID)}
 	@appKey		{"AppKey", Application.get_env(:musikki, :appKey)}
 
-	def search(artist_name, filters \\ :empty) do
+
+	@doc """
+	Returns a summarized list of artists matching the query parameters.
+	Filters:
+		artist-name:  string, optional
+		artist-alias: string, optional
+		label-name:   string, optional
+		label-mkid:   int, 	  optional
+	"""
+	def search(filters) do
 		HTTPoison.request(
 			:get, 
-			@host <> @endpoint <> "?q=#{artist_name}",
+			@host <> @endpoint <> build_query_params(filters, ""),
 			"",
 			[
 				@appID,
@@ -17,6 +27,10 @@ defmodule Musikki.Artists do
 		
 	end
 
+	@doc """
+	Returns a complete profile for one specific artist.
+	mkid: int, required
+	"""
 	def info(mkid) do
 		HTTPoison.request(
 			:get, 
@@ -28,6 +42,10 @@ defmodule Musikki.Artists do
 			])  
 	end
 
+	@doc """
+	Returns a list of alternative biographies from multiple sources.
+	mkid: int, required
+	"""
 	def bio(mkid) do 
 		HTTPoison.request(
 			:get, 
@@ -39,18 +57,15 @@ defmodule Musikki.Artists do
 			])  		
 	end
 
-	def collaborations(mkid) do
-		HTTPoison.request(
-			:get, 
-			@host <> @endpoint <> "/#{mkid}" <> "/collaborations", 
-			"", 
-			[
-				@appID, 
-				@appKey
-			])
-	end
-
-	def collaborations(mkid, filters) do 
+	@doc """
+	Returns a list of artists who have collaborated with the artist.
+	mkid: 								int, 	  required
+	Filters:
+		artist-name: 				string, optional
+		label-name:  				string, optional
+		collaboration-name: string, optional
+	"""
+	def collaborations(mkid, filters \\ :empty) do 
 		HTTPoison.request(
 			:get, 
 			@host <> @endpoint <> "/#{mkid}" <> "/collaborations" <> build_query_params(filters, ""), 
@@ -61,6 +76,17 @@ defmodule Musikki.Artists do
 			])
 	end
 
+	@doc """
+	Returns a list of labels related to the artist.
+	mkid: 					 int,    required
+	Filters:
+		label-name:    string, optional
+		artist-name:   string, optional
+		release-mkid:  int,    optional
+		release-title: string, optional
+		edition-mkid:  int, 	 optional
+		edition-title: string, optional
+	"""
 	def labels(mkid) do 
 		HTTPoison.request(
 			:get, 
@@ -72,6 +98,10 @@ defmodule Musikki.Artists do
 			])		
 	end
 
+	@doc """
+	Returns a list of external streaming services for the artist.
+	mkid: int, required	
+	"""
 	def listen(mkid) do 
 		HTTPoison.request(
 			:get, 
@@ -83,6 +113,10 @@ defmodule Musikki.Artists do
 			])				
 	end
 
+	@doc """
+	Returns articles, from various media, related to the artist.
+	mkid: int, required	
+	"""
 	def news(mkid) do 
 		HTTPoison.request(
 			:get, 
@@ -94,6 +128,12 @@ defmodule Musikki.Artists do
 			])				
 	end	
 
+	@doc """
+	Returns a list of related artists.
+	mkid: 					 int,    required
+	type:
+		relation-type: string, required, value: ["sound" or "label"]
+	"""
 	def related(mkid, type) do 
 		HTTPoison.request(
 			:get, 
@@ -105,18 +145,18 @@ defmodule Musikki.Artists do
 			])			
 	end
 
-	def releases(mkid) do
-		HTTPoison.request(
-			:get, 
-			@host <> @endpoint <> "/#{mkid}" <> "/releases", 
-			"", 
-			[
-				@appID, 
-				@appKey
-			])
-	end	
-
-	def releases(mkid, filters) do 
+	@doc """
+	Returns the artist's complete discography.
+	mkid: 					 	 int, 	 required
+	filters:
+		artist-name: 		 string, optional
+		artist-mkid: 	   int, 	 optional
+		release-title: 	 string, optional
+		release-type: 	 string, optional, value: ["Album" or "EP" or "Single"]
+		release-format:  string, optional, value: ["CD" or "Vinyl" or "Digital"]
+		release-barcode: string, optional
+	"""
+	def releases(mkid, filters \\ :empty) do 
 		HTTPoison.request(
 			:get, 
 			@host <> @endpoint <> "/#{mkid}" <> "/releases" <> build_query_params(filters, ""), 
@@ -127,6 +167,10 @@ defmodule Musikki.Artists do
 			])
 	end
 
+	@doc """
+	Returns a release count summary, grouped by release types.
+	mkid: int, required
+	"""
 	def release_summary(mkid) do
 	 	HTTPoison.request(
 			:get, 
@@ -138,6 +182,11 @@ defmodule Musikki.Artists do
 			])
 	end
 
+	@doc """
+	Returns the artist's social account streams.
+	mkid: 	 int,    required
+	service: string, required, value: ["facebook" or "twitter"]
+	"""
 	def social(mkid, service) do 
 		HTTPoison.request(
 			:get, 
@@ -149,18 +198,21 @@ defmodule Musikki.Artists do
 			])			
 	end	
 
-def songs(mkid) do
-		HTTPoison.request(
-			:get, 
-			@host <> @endpoint <> "/#{mkid}" <> "/songs", 
-			"", 
-			[
-				@appID, 
-				@appKey
-			])
-	end	
+	@doc """
+	Returns the artist's complete song list.
+	mkid: 				 int, 	 required
+	filters: 
+	artist-name:   string, optional
+	artist-mkid:   int, 	 optional
+	edition-mkid:  int, 	 optional
+	edition-title: string, optional
+	query-type: 	 string, optional, value: ["suggest" or "full"]
+	release-mkid:  int, 	 optional
+	release-title: string, optional
+	song-title: 	 string, optional
 
-	def songs(mkid, filters) do 
+	"""
+	def songs(mkid, filters \\ :empty) do 
 		HTTPoison.request(
 			:get, 
 			@host <> @endpoint <> "/#{mkid}" <> "/songs" <> build_query_params(filters, ""), 
@@ -171,18 +223,17 @@ def songs(mkid) do
 			])
 	end
 
-	def videos(mkid) do 
-		HTTPoison.request(
-			:get, 
-			@host <> @endpoint <> "/#{mkid}" <> "/videos", 
-			"", 
-			[
-				@appID, 
-				@appKey
-			])		
-	end
-
-	def videos(mkid, filters) do 
+	@doc """
+	Returns videos related to the artist.
+	mkid: 					int, 		required
+	filters:
+		service-name: string, optional, value: ["youtube"]
+		artist-mkid:  int, 		optional
+		release-mkid: int, 		optional
+		track-mkid: 	int, 		optional
+		video-id: 		int, 		optional
+	"""
+	def videos(mkid, filters \\ :empty) do 
 		HTTPoison.request(
 			:get, 
 			@host <> @endpoint <> "/#{mkid}" <> "/videos" <> build_query_params(filters, ""), 
@@ -192,14 +243,4 @@ def songs(mkid) do
 				@appKey
 			])		
 	end	
-
-	defp build_query_params([], param_list), do: "?q=" <> param_list
-	defp build_query_params([{param, value} | tail], param_list) do 
-		case tail do 
-			[] -> build_query_params tail, param_list <> "[#{param}:#{value}]"
-
-			_  -> build_query_params tail, param_list <> "[#{param}:#{value}],"
-		end		
-	end
- 	
- end
+end
