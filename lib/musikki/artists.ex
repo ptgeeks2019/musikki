@@ -1,6 +1,12 @@
 defmodule Musikki.Artists do
 	import Musikki.Helper, only: [build_query_params: 2]
 
+	@moduledoc """
+	Implements the Artists endpoint of the Musikki API.
+	The Artists endpoints provide a wide range of artist related information.
+	"Powered by Musikki" -- www.musikki.com
+	"""
+
 	@endpoint ~s(/artists)
 	@host 							 Application.get_env(:musikki, :host)
 	@appID 		{"AppID",  Application.get_env(:musikki, :appID)}

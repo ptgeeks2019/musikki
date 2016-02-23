@@ -1,6 +1,11 @@
 defmodule Musikki.Releases do
 	import Musikki.Helper, only: [build_query_params: 2]
 
+	@moduledoc """
+	Implements the Releases endpoint of the Musikki API.
+	The Releases endpoints provide information about master releases.
+	"Powered by Musikki" -- www.musikki.com
+	"""
 
 	@endpoint ~s(/releases)
 	@host 							 Application.get_env(:musikki, :host)
