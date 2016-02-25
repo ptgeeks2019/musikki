@@ -78,5 +78,4 @@ defmodule Musikki.Songs do
 				@appKey
 			])		
 	end	
-	
 end

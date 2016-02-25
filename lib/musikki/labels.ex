@@ -90,5 +90,4 @@ defmodule Musikki.Labels do
 				@appKey
 			])
 	end			
-
 end
