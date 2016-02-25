@@ -38,3 +38,5 @@ And decode with Poison.
 Query parameters must be passed as list of tuples. Example:
 
 <pre><code>Musikki.Editions.songs [{"artist-name", "Porcupine+Tree"}, {"song-title", "Lightbulb+Sun"}]</code></pre>
+
+# Powered by Musikki 
